@@ -10,7 +10,7 @@ const USERS = [
     { "username": "code309", "password": "9425", "expiresAt": "2025-12-16" },
     { "username": "code933", "password": "4232", "expiresAt": "2025-12-16" },
     { "username": "code283", "password": "1667", "expiresAt": "2025-12-16" },
-    { "username": "admin", "password": "123456", "expiresAt": "2025-12-16" }
+    { "username": "admin", "password": "1234567", "expiresAt": "2025-12-16" }
 ];
 // </USERS_DATA>
 
