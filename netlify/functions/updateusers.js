@@ -11,7 +11,7 @@ const FIXED_ADMIN = {
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const REPO_OWNER = process.env.REPO_OWNER || "virtualformacion";
-const REPO_NAME = process.env.REPO_NAME || "store-molano";
+const REPO_NAME = process.env.REPO_NAME || "store-molano2";
 const FILE_PATH = process.env.FILE_PATH || "script.js";
 const BRANCH = process.env.BRANCH || "main";
 
