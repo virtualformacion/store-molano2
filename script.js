@@ -1,18 +1,19 @@
 // ========== USUARIOS AUTORIZADOS (NO EDITAR MANUALMENTE EN ESTE BLOQUE) ==========
 // <USERS_DATA>
 const USERS = [
-    { "username": "lord", "password": "1111", "expiresAt": "2025-11-28" },
-    { "username": "codigos", "password": "3602", "expiresAt": "2025-12-02" },
-    { "username": "usuario448", "password": "4448", "expiresAt": "2025-12-10" },
-    { "username": "usuario950", "password": "6244", "expiresAt": "2025-12-12" },
-    { "username": "usuario507", "password": "3012", "expiresAt": "2025-12-12" },
-    { "username": "usuario412", "password": "1716", "expiresAt": "2025-12-12" },
-    { "username": "code309", "password": "9425", "expiresAt": "2025-12-16" },
-    { "username": "code933", "password": "4232", "expiresAt": "2025-12-16" },
-    { "username": "code283", "password": "1667", "expiresAt": "2025-12-16" },
-    { "username": "admin", "password": "1234567", "expiresAt": "2025-12-16" }
+    { username: "lord", password: "1111", expiresAt: new Date("2025-11-28") },
+    { username: "codigos", password: "3602", expiresAt: new Date("2025-12-02") },
+    { username: "usuario448", password: "4448", expiresAt: new Date("2025-12-10") },
+    { username: "usuario950", password: "6244", expiresAt: new Date("2025-12-12") },
+    { username: "usuario507", password: "3012", expiresAt: new Date("2025-12-12") },
+    { username: "usuario412", password: "1716", expiresAt: new Date("2025-12-12") },
+    { username: "code309", password: "9425", expiresAt: new Date("2025-12-16") },
+    { username: "code933", password: "4232", expiresAt: new Date("2025-12-16") },
+    { username: "code283", password: "1667", expiresAt: new Date("2025-12-16") },
+    { username: "admin", password: "1234567", expiresAt: new Date("2025-12-16") }
 ];
 // </USERS_DATA>
+
 
 
 const MAX_ATTEMPTS = 300000;
