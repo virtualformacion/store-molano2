@@ -1,0 +1,200 @@
+<!-- admin.html -->
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Panel Admin - Usuarios</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;padding:20px}
+    table{border-collapse:collapse;width:100%;margin-top:10px}
+    th,td{border:1px solid #ddd;padding:8px;text-align:left}
+    tr:nth-child(even){background:#f9f9f9}
+    .btn{padding:6px 10px;border:none;border-radius:4px;cursor:pointer}
+    .btn-red{background:#c83b3b;color:#fff}
+    .btn-green{background:#2f8f2f;color:#fff}
+    .btn-blue{background:#1f6fb8;color:#fff}
+    .hidden{display:none}
+    .form-row{margin:6px 0}
+    label{display:block;font-size:13px;margin-bottom:4px}
+    input[type=text], input[type=password], input[type=date]{width:100%;padding:8px;box-sizing:border-box}
+    #loginBox, #panel{max-width:700px;margin:0 auto;}
+  </style>
+</head>
+<body>
+
+<div id="loginBox">
+  <h2>Login Admin</h2>
+  <div class="form-row"><label>Usuario</label><input id="loginUser" type="text" value=""></div>
+  <div class="form-row"><label>Contraseña</label><input id="loginPass" type="password" value=""></div>
+  <button id="btnLogin" class="btn btn-blue">Entrar</button>
+  <div id="loginMsg"></div>
+</div>
+
+<div id="panel" class="hidden">
+  <h2>Panel Admin - Gestión de Usuarios</h2>
+  <button id="btnLogout" class="btn">Cerrar sesión</button>
+
+  <h3>Crear nuevo usuario</h3>
+  <div class="form-row"><label>Usuario</label><input id="newUser" type="text"></div>
+  <div class="form-row"><label>Contraseña</label><input id="newPass" type="password"></div>
+  <div class="form-row"><label>Fecha de vencimiento</label><input id="newDate" type="date"></div>
+  <button id="btnCreate" class="btn btn-green">Crear usuario</button>
+  <div id="createMsg"></div>
+
+  <h3>Usuarios existentes</h3>
+  <table id="usersTable">
+    <thead><tr><th>Usuario</th><th>Contraseña</th><th>Vencimiento</th><th>Acciones</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<!-- Edit modal (simple) -->
+<div id="editModal" class="hidden" style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;padding:20px;border:1px solid #ccc;z-index:999;">
+  <h4>Editar usuario</h4>
+  <div class="form-row"><label>Usuario actual</label><input id="editUser" type="text" disabled></div>
+  <div class="form-row"><label>Nuevo usuario</label><input id="editNewUser" type="text"></div>
+  <div class="form-row"><label>Contraseña</label><input id="editPass" type="text"></div>
+  <div class="form-row"><label>Vencimiento</label><input id="editDate" type="date"></div>
+  <button id="btnSaveEdit" class="btn btn-green">Guardar</button>
+  <button id="btnCloseEdit" class="btn btn-red">Cancelar</button>
+  <div id="editMsg"></div>
+</div>
+
+<script>
+const FUNC_URL = "/.netlify/functions/update-users";
+
+let adminUser = "";
+let adminPass = "";
+
+document.getElementById("btnLogin").addEventListener("click", async () => {
+  adminUser = document.getElementById("loginUser").value.trim();
+  adminPass = document.getElementById("loginPass").value;
+  if (!adminUser || !adminPass) {
+    document.getElementById("loginMsg").innerText = "Introduce usuario y contraseña.";
+    return;
+  }
+  // Probamos listar para validar credenciales
+  const res = await callFunc({ action: "list", adminUser, adminPass });
+  if (res && res.users) {
+    document.getElementById("loginBox").classList.add("hidden");
+    document.getElementById("panel").classList.remove("hidden");
+    renderUsers(res.users);
+  } else {
+    document.getElementById("loginMsg").innerText = res && res.error ? res.error : "Error login";
+  }
+});
+
+document.getElementById("btnLogout").addEventListener("click", () => {
+  adminUser = ""; adminPass = "";
+  document.getElementById("panel").classList.add("hidden");
+  document.getElementById("loginBox").classList.remove("hidden");
+});
+
+// Crear
+document.getElementById("btnCreate").addEventListener("click", async () => {
+  const username = document.getElementById("newUser").value.trim();
+  const password = document.getElementById("newPass").value;
+  const expiresAt = document.getElementById("newDate").value;
+  if (!username || !password || !expiresAt) {
+    document.getElementById("createMsg").innerText = "Completa todos los campos";
+    return;
+  }
+  const res = await callFunc({ action: "create", adminUser, adminPass, payload: { username, password, expiresAt } });
+  if (res && res.success) {
+    document.getElementById("createMsg").innerText = "Usuario creado correctamente (commit efectuado).";
+    // refrescar lista
+    const list = await callFunc({ action: "list", adminUser, adminPass });
+    renderUsers(list.users);
+  } else {
+    document.getElementById("createMsg").innerText = res && res.error ? res.error : "Error al crear";
+  }
+});
+
+// render tabla
+function renderUsers(users) {
+  const tbody = document.querySelector("#usersTable tbody");
+  tbody.innerHTML = "";
+  users.forEach(u => {
+    // Mostrar fechas en YYYY-MM-DD o vacio
+    const expires = u.expiresAt ? (new Date(u.expiresAt)).toISOString().slice(0,10) : "";
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${escapeHtml(u.username)}</td>
+                    <td>${escapeHtml(u.password)}</td>
+                    <td>${escapeHtml(expires)}</td>
+                    <td>
+                      <button class="btn btn-green" data-user="${escapeHtml(u.username)}" onclick="openEdit(event)">Editar</button>
+                      <button class="btn btn-red" data-user="${escapeHtml(u.username)}" onclick="delUser(event)">Eliminar</button>
+                    </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// editar
+window.openEdit = function(e){
+  const user = e.target.getAttribute("data-user");
+  document.getElementById("editUser").value = user;
+  document.getElementById("editNewUser").value = user;
+  document.getElementById("editPass").value = "";
+  document.getElementById("editDate").value = "";
+  document.getElementById("editModal").classList.remove("hidden");
+}
+
+document.getElementById("btnCloseEdit").addEventListener("click", ()=> {
+  document.getElementById("editModal").classList.add("hidden");
+});
+
+document.getElementById("btnSaveEdit").addEventListener("click", async ()=> {
+  const username = document.getElementById("editUser").value;
+  const newUsername = document.getElementById("editNewUser").value.trim();
+  const password = document.getElementById("editPass").value;
+  const expiresAt = document.getElementById("editDate").value;
+  const payload = { username };
+  if (newUsername) payload.newUsername = newUsername;
+  if (password) payload.password = password;
+  if (expiresAt) payload.expiresAt = expiresAt;
+  const res = await callFunc({ action: "edit", adminUser, adminPass, payload });
+  if (res && res.success) {
+    document.getElementById("editMsg").innerText = "Guardado y commit efectuado.";
+    document.getElementById("editModal").classList.add("hidden");
+    const list = await callFunc({ action: "list", adminUser, adminPass });
+    renderUsers(list.users);
+  } else {
+    document.getElementById("editMsg").innerText = res && res.error ? res.error : "Error al guardar";
+  }
+});
+
+// eliminar
+window.delUser = async function(e){
+  if (!confirm("¿Eliminar este usuario?")) return;
+  const username = e.target.getAttribute("data-user");
+  const res = await callFunc({ action: "delete", adminUser, adminPass, payload: { username } });
+  if (res && res.success) {
+    alert("Usuario eliminado y commit efectuado.");
+    const list = await callFunc({ action: "list", adminUser, adminPass });
+    renderUsers(list.users);
+  } else {
+    alert(res && res.error ? res.error : "Error al eliminar");
+  }
+}
+
+async function callFunc(body) {
+  try {
+    const res = await fetch(FUNC_URL, {
+      method: "POST",
+      headers: { "Content-Type":"application/json" },
+      body: JSON.stringify(body)
+    });
+    return await res.json();
+  } catch (err) {
+    return { error: err.message };
+  }
+}
+
+function escapeHtml(s) {
+  if (!s && s !== 0) return "";
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c]));
+}
+</script>
+</body>
+</html>
