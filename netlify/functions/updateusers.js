@@ -5,7 +5,7 @@
 const FIXED_ADMIN = {
   username: "admin",
   password: "123456",
-  expiresAt: "2025-11-16"
+  expiresAt: "2025-12-16"
 };
 // ============================================
 
@@ -116,7 +116,7 @@ exports.handler = async function (event) {
 
     const now = new Date();
     if (now > new Date(FIXED_ADMIN.expiresAt)) {
-      return { statusCode: 403, body: JSON.stringify({ error: "Acceso admin vencido" }) };
+      return { statusCode: 403, body: JSON.stringify({ error: "Acceso admin vencido, renueva tu plan ahora para seguir administrando tu web" }) };
     }
     // ===================================================
 
