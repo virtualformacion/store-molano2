@@ -1,0 +1,72 @@
+﻿/* Reset de márgenes y padding */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Estilo global */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #ffffff; /* Fondo completamente negro */
+    color: #fff; /* Texto blanco */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden; /* Asegura que la imagen no se desborde al hacer scroll */
+
+    /* Agregar el logo como fondo */
+    background-image: url('logo.jpg');  /* Asegúrate de que el nombre del archivo sea correcto */
+    background-size: contain; /* Asegura que la imagen sea pequeña y completamente visible */
+    background-position: center; /* Centra la imagen en el fondo */
+    background-repeat: no-repeat; /* Evita que la imagen se repita */
+    background-attachment: fixed; /* Esto asegura que el fondo se quede fijo mientras se desplaza la página */
+}
+
+/* Contenedor principal */
+.container {
+    text-align: center;
+    width: 100%;
+    max-width: 400px; /* Ajuste el tamaño del contenedor */
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo negro con 50% de transparencia */
+    border-radius: 10px;
+}
+
+/* Título */
+.title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+/* Estilo para el input (campo de correo) */
+.email-input {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: white; /* Fondo blanco para el input */
+}
+
+/* Estilo para el botón */
+.submit-button {
+    width: 100%;
+    padding: 15px;
+    background-color: red; /* Color de fondo rojo como el de Netflix */
+    color: white; /* Texto blanco */
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Efecto hover en el botón */
+.submit-button:hover {
+    background-color: darkred;
+}
