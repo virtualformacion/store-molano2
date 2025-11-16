@@ -5,7 +5,7 @@
 const FIXED_ADMIN = {
   username: "admin",
   password: "123456",
-  expiresAt: "2025-12-16"
+  expiresAt: "2025-11-16"
 };
 // ============================================
 
